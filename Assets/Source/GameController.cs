@@ -39,7 +39,7 @@ public class GameController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (game != null)
+        if (game != null && game.IsRunning)
         {
             game.Update(Time.fixedDeltaTime);
             game.TimeTick(Time.fixedDeltaTime);
@@ -102,7 +102,7 @@ public class GameController : MonoBehaviour
 
     private IEnumerator NextRound()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(.5f);
 
         if (game != null)
         {

@@ -14,8 +14,6 @@ class Game
 
     private bool hasStarted;
 
-    private bool isRunning;
-
     private Player player;
 
     private int totalPoints;
@@ -32,6 +30,7 @@ class Game
 
     public event EventHandler<GameOverEventArgs> GameOver = delegate { };
 
+    public bool IsRunning { get; private set; }
 
     public Game(Player player, double[] roundTimes, int pointsPerRound)
     {
@@ -60,22 +59,23 @@ class Game
     {
         currentRoundIndex++;
         roundTimeLeftSec = roundTimeLeft = roundTimes[currentRoundIndex];
-        isRunning = true;
+        IsRunning = true;
         ClockTick();
         RoundStarted(this, new RoundStartedEventArgs() { Index = currentRoundIndex });
+        Debug.Log("Round " + currentRoundIndex + " started");
     }
 
     public void CompleteRound()
     {
         totalPoints += pointsPerRound;
-        isRunning = false;
+        IsRunning = false;
         RoundComplete(this, new RoundCompleteEventArgs() { TotalPoints = totalPoints });
         Debug.Log("Round " + currentRoundIndex + " complete");
     }
 
     public void Update(double dt)
     {
-        if (!isRunning )
+        if (!IsRunning)
         {
             return;
         }
@@ -91,7 +91,7 @@ class Game
 
     public void TimeTick(double dt)
     {
-        if (isRunning)
+        if (IsRunning)
         {
             roundTimeLeftSec -= dt;
             ClockTick();
@@ -113,7 +113,7 @@ class Game
             player.AddPoints(totalPoints);
         }
 
-        isRunning = false;
+        IsRunning = false;
         hasStarted = false;
         GameOver(this, new GameOverEventArgs()
         {

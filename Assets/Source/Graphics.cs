@@ -49,7 +49,7 @@ class Graphics : MonoBehaviour
     {
         menuScreen.gameObject.SetActive(true);
         startButton.interactable = true;
-        resultsGui.gameObject.SetActive(false); 
+        resultsGui.gameObject.SetActive(false);
         gameGui.gameObject.SetActive(false);
     }
 
@@ -57,7 +57,8 @@ class Graphics : MonoBehaviour
     {
         if (game == null)
         {
-            Debug.LogError("Graphics: Init() failed: game is null");
+            Debug.LogError("Graphics: Initialize() failed: game is null");
+            return;
         }
 
         game.GameStarted += OnGameStarted;
@@ -69,8 +70,18 @@ class Graphics : MonoBehaviour
 
     private void OnGameStarted(object sender, System.EventArgs e)
     {
-        menuScreen.gameObject.SetActive(false);
+        if (menuScreen.gameObject.activeSelf)
+        {
+            menuScreen.gameObject.SetActive(false);
+        }
+
+        if (resultsGui.gameObject.activeSelf)
+        {
+            resultsGui.gameObject.SetActive(false);
+        }
+
         gameGui.gameObject.SetActive(true);
+        points.text = 0.ToString();
     }
 
     private void OnTimeUpdated(object sender, TimeUpdatedEventArgs e)
@@ -99,15 +110,9 @@ class Graphics : MonoBehaviour
         game.RoundStarted -= OnRoundStarted;
         game.RoundComplete -= OnRoundComplete;
         game.GameOver -= OnGameComplete;
-        
-        StartCoroutine(GameComplete(e));
-    }
 
-    private IEnumerator GameComplete(GameOverEventArgs e)
-    {
         resultsGui.gameObject.SetActive(true);
         gamePoints.text = "Вы набрали очков: " + e.Points.ToString();
-        yield return null;
     }
 }
 
