@@ -11,6 +11,8 @@ public class GameController : MonoBehaviour
 
     private Player player;
 
+    private List<Line> candidateLines;
+
     [SerializeField]
     private int millisPerRoundMax = 10000;
 
@@ -23,6 +25,23 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private InputManager input;
 
+    [SerializeField]
+    private Figure figure;
+
+    public void StartGame()
+    {
+        graphics.Initialize(game);
+        game.Start();
+    }
+
+    // Public for a cheat
+    public void CompleteRound()
+    {
+        game.CompleteRound();
+        input.Reset();
+        StartCoroutine(NextRound());
+    }
+
     private void Awake()
     {
         if (!gameLevel || !input || !graphics)
@@ -34,6 +53,9 @@ public class GameController : MonoBehaviour
         player = new Player();
 
         game = new Game(player, CalculateRoundTimes(50), 1);
+        game.RoundStarted += OnGameRoundStarted;
+        game.RoundComplete += OnGameRoundComplete;
+        game.GameStarted += OnGameStarted;
         game.GameOver += OnGameOver;
     }
 
@@ -46,12 +68,12 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void StartGame()
+    private void OnDestroy()
     {
-        graphics.Initialize(game);
-
-        game.GameOver += OnGameOver;
-        game.Start();
+        game.RoundStarted -= OnGameRoundStarted;
+        game.RoundComplete -= OnGameRoundComplete;
+        game.GameStarted -= OnGameStarted;
+        game.GameOver -= OnGameOver;
     }
 
     /// <summary>
@@ -89,15 +111,37 @@ public class GameController : MonoBehaviour
         return times;
     }
 
-    public void CompleteRound()
+    private void OnGameStarted(object sender, System.EventArgs e)
     {
-        game.CompleteRound();
-        StartCoroutine(NextRound());
+        game.GameOver += OnGameOver;
     }
 
     private void OnGameOver(object sender, GameOverEventArgs e)
     {
         game.GameOver -= OnGameOver;
+        Unsubscribe();
+    }
+
+    private void OnGameRoundStarted(object sender, RoundStartedEventArgs e)
+    {
+        input.TouchStarted += figure.OnInputTouchStarted;
+        input.PointerMoved += figure.OnInputPointerMoved;
+        input.AcceptInput = true;
+        figure.DrawSuccess += CompleteRound;
+        figure.Initialize();
+    }
+
+    private void OnGameRoundComplete(object sender, RoundCompleteEventArgs e)
+    {
+        Unsubscribe();
+    }
+
+    private void Unsubscribe()
+    {
+        input.AcceptInput = false;
+        input.TouchStarted -= figure.OnInputTouchStarted;
+        input.PointerMoved -= figure.OnInputPointerMoved;
+        figure.DrawSuccess -= CompleteRound;
     }
 
     private IEnumerator NextRound()
