@@ -125,6 +125,7 @@ public class GameController : MonoBehaviour
     private void OnGameRoundStarted(object sender, RoundStartedEventArgs e)
     {
         input.TouchStarted += figure.OnInputTouchStarted;
+        input.TouchEnded += figure.Initialize;
         input.PointerMoved += figure.OnInputPointerMoved;
         input.AcceptInput = true;
         figure.DrawSuccess += CompleteRound;
@@ -139,6 +140,7 @@ public class GameController : MonoBehaviour
     private void Unsubscribe()
     {
         input.AcceptInput = false;
+        input.TouchEnded -= figure.Initialize;
         input.TouchStarted -= figure.OnInputTouchStarted;
         input.PointerMoved -= figure.OnInputPointerMoved;
         figure.DrawSuccess -= CompleteRound;

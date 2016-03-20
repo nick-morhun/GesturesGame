@@ -23,6 +23,9 @@ public class Figure : MonoBehaviour
 
     public event UnityAction DrawSuccess = delegate { };
 
+    /// <summary>
+    /// Call this before every try.
+    /// </summary>
     public void Initialize()
     {
         candidateLines = new List<Line>(figureLines.Count);

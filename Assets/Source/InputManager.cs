@@ -15,7 +15,7 @@ public class InputManager : MonoBehaviour
 
     public event UnityAction<Vector3> TouchStarted = delegate { };
 
-    public event UnityAction<Vector3> TouchEnded = delegate { };
+    public event UnityAction TouchEnded = delegate { };
 
     public event UnityAction<Vector3> PointerMoved = delegate { };
 
@@ -54,7 +54,7 @@ public class InputManager : MonoBehaviour
         {
             isPointerDown = false;
             Debug.Log("Touch ended at screen coordinates " + pointerWorldPosition);
-            TouchEnded(pointerWorldPosition);
+            TouchEnded();
         }
 
 #if DEBUG_CTRLS
