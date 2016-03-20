@@ -51,7 +51,6 @@ class Game
         hasStarted = true;
         currentRoundIndex = -1;
         totalPoints = 0;
-        StartNextRound();
         GameStarted(this, new EventArgs());
     }
 

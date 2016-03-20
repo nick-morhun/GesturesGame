@@ -11,7 +11,6 @@ public class Figure : MonoBehaviour
 
     private float currentLineAngle;
 
-    // TODO: compute this
     private float minVertexAngle = 45;
 
     private List<Line> uncheckedLines;
@@ -19,14 +18,21 @@ public class Figure : MonoBehaviour
     private List<Line> candidateLines;
 
     [SerializeField]
+    [Range(1f, 100f)]
+    private float sensitivity = 1;
+
+    [SerializeField]
     private List<Line> figureLines;
+
+
+    public event UnityAction Ready = delegate { };
 
     public event UnityAction DrawSuccess = delegate { };
 
     /// <summary>
     /// Call this before every try.
     /// </summary>
-    public void Initialize()
+    public void StartTry()
     {
         candidateLines = new List<Line>(figureLines.Count);
         uncheckedLines = new List<Line>(figureLines);
@@ -57,7 +63,7 @@ public class Figure : MonoBehaviour
     }
 
     // Use this for initialization
-    private void Start()
+    public void Init()
     {
         if (figureLines.Count < 3)
         {
@@ -71,13 +77,33 @@ public class Figure : MonoBehaviour
         {
             figureLines[i].Previous = figureLines[i - 1];
         }
+
+        StartCoroutine(ComputeCornerThreshold());
+    }
+
+    private IEnumerator ComputeCornerThreshold()
+    {
+        yield return null;
+        float[] figureAngles = new float[figureLines.Count];
+
+        for (int i = 0; i < figureLines.Count; i++)
+        {
+            float ang = Line.Angle(figureLines[i], figureLines[i].Previous);
+            ang += 180;
+            figureAngles[i] = ang > 360 ? ang - 360 : ang;
+            Debug.Log("figureAngles[" + i + "] = " + figureAngles[i]);
+        }
+
+        minVertexAngle = Mathf.Min(figureAngles) / (2f * sensitivity);
+        Debug.Log("minVertexAngle = " + minVertexAngle);
+        Ready();
     }
 
     private bool WasLine(float drawnAngle)
     {
         bool wasLine = false;
 
-        if (currentLineAngle != InvalidAngle && Mathf.Abs(currentLineAngle - drawnAngle) < MinAngle())
+        if (currentLineAngle != InvalidAngle && Mathf.Abs(currentLineAngle - drawnAngle) < minVertexAngle)
         {
             return false;
         }
@@ -89,7 +115,7 @@ public class Figure : MonoBehaviour
             // Other lines were complete
             foreach (var line in uncheckedLines)
             {
-                if (line.Match(drawnAngle, MinAngle()))
+                if (line.Match(drawnAngle, minVertexAngle))
                 {
                     int prevLineIdx = candidateLines.IndexOf(line.Previous);
                     if (prevLineIdx != -1)
@@ -123,7 +149,7 @@ public class Figure : MonoBehaviour
 
         foreach (var line in uncheckedLines)
         {
-            if (line.Match(drawnAngle, MinAngle()))
+            if (line.Match(drawnAngle, minVertexAngle))
             {
                 candidateLines.Add(line);
                 wasLine = true;
@@ -142,10 +168,5 @@ public class Figure : MonoBehaviour
         }
 
         return wasLine;
-    }
-
-    private float MinAngle()
-    {
-        return minVertexAngle;
     }
 }

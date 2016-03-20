@@ -39,7 +39,6 @@ public class GameController : MonoBehaviour
     {
         game.CompleteRound();
         input.Reset();
-        StartCoroutine(NextRound());
     }
 
     private void Awake()
@@ -113,37 +112,39 @@ public class GameController : MonoBehaviour
 
     private void OnGameStarted(object sender, System.EventArgs e)
     {
-        game.GameOver += OnGameOver;
+        LoadFigure();
     }
 
     private void OnGameOver(object sender, GameOverEventArgs e)
     {
-        game.GameOver -= OnGameOver;
         Unsubscribe();
+        RemoveFigure();
     }
 
     private void OnGameRoundStarted(object sender, RoundStartedEventArgs e)
     {
         input.TouchStarted += figure.OnInputTouchStarted;
-        input.TouchEnded += figure.Initialize;
+        input.TouchEnded += figure.StartTry;
         input.PointerMoved += figure.OnInputPointerMoved;
         input.AcceptInput = true;
         figure.DrawSuccess += CompleteRound;
-        figure.Initialize();
     }
 
     private void OnGameRoundComplete(object sender, RoundCompleteEventArgs e)
     {
         Unsubscribe();
+        RemoveFigure();
+        StartCoroutine(NextRound());
     }
 
     private void Unsubscribe()
     {
         input.AcceptInput = false;
-        input.TouchEnded -= figure.Initialize;
+        input.TouchEnded -= figure.StartTry;
         input.TouchStarted -= figure.OnInputTouchStarted;
         input.PointerMoved -= figure.OnInputPointerMoved;
         figure.DrawSuccess -= CompleteRound;
+        figure.Ready -= game.StartNextRound;
     }
 
     private IEnumerator NextRound()
@@ -152,7 +153,22 @@ public class GameController : MonoBehaviour
 
         if (game != null)
         {
-            game.StartNextRound();
+            LoadFigure();
         }
+    }
+
+    private void LoadFigure()
+    {
+        // TODO: Load new figure
+        figure.gameObject.SetActive(true);
+        figure.Init();
+        figure.StartTry();
+        figure.Ready += game.StartNextRound;
+    }
+
+    private void RemoveFigure()
+    {
+        // TODO: destroy GO
+        figure.gameObject.SetActive(false);
     }
 }

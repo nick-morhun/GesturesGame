@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public class Line : MonoBehaviour
 {
+    /// <summary>
+    /// Available after Start()
+    /// </summary>
     float angle;
 
     [SerializeField]
@@ -23,17 +26,17 @@ public class Line : MonoBehaviour
         return Mathf.Abs(angle - this.angle) < minMatchAngle;
     }
 
+    public static float Angle(Line l1, Line l2)
+    {
+        // Debug.Log(l1.angle - l2.angle);
+        return l1.angle - l2.angle;
+    }
+
     // Use this for initialization
-    void Start()
+    private void Start()
     {
         angle = transform.localRotation.eulerAngles.z;
         angle = angle > 180 ? angle - 360 : angle;
         Debug.Log("Line at angle " + angle);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 }
