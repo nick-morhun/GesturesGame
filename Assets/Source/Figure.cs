@@ -22,6 +22,10 @@ public class Figure : MonoBehaviour
     private float sensitivity = 1;
 
     [SerializeField]
+    [Range(.1f, 10f)]
+    private int minLineLength = 1;
+
+    [SerializeField]
     private List<Line> figureLines;
 
 
@@ -79,6 +83,25 @@ public class Figure : MonoBehaviour
         }
 
         StartCoroutine(ComputeCornerThreshold());
+    }
+
+    public bool Validate()
+    {
+        if (figureLines.Count < 3)
+        {
+            Debug.LogError("At least 3 lines required");
+            return false;
+        }
+
+        for (int i = 0; i < figureLines.Count; i++)
+        {
+            if (!figureLines[i].IsValid(minLineLength))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private IEnumerator ComputeCornerThreshold()

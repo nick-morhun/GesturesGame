@@ -162,8 +162,12 @@ public class GameController : MonoBehaviour
         // TODO: Load new figure
         figure.gameObject.SetActive(true);
         figure.Init();
-        figure.StartTry();
-        figure.Ready += game.StartNextRound;
+
+        if (figure.Validate())
+        {
+            figure.StartTry();
+            figure.Ready += game.StartNextRound;
+        }
     }
 
     private void RemoveFigure()

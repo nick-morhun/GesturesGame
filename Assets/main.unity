@@ -523,6 +523,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8ff4ba6caf392f469a3d5ca0a43b6e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sensitivity: 1
   figureLines:
   - {fileID: 1578678591}
   - {fileID: 2092073296}
@@ -1551,6 +1552,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   millisPerRoundMax: 60000
+  minLineLength: 1
   gameLevel: {fileID: 454784037}
   graphics: {fileID: 572700708}
   input: {fileID: 448495202}

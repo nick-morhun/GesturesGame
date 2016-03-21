@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 public class Line : MonoBehaviour
 {
@@ -30,6 +28,12 @@ public class Line : MonoBehaviour
     {
         // Debug.Log(l1.angle - l2.angle);
         return l1.angle - l2.angle;
+    }
+
+    public bool IsValid(float minLength)
+    {
+        Debug.Log("Line length: "+(EndPoint - StartPoint).magnitude);
+        return (EndPoint - StartPoint).magnitude >= minLength;
     }
 
     // Use this for initialization
