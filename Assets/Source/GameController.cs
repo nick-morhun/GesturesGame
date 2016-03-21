@@ -11,13 +11,15 @@ public class GameController : MonoBehaviour
 
     private Player player;
 
-    private List<Line> candidateLines;
+    private FiguresXml figuresXml;
+
+    private int currentFigureIdx = 0;
 
     [SerializeField]
     private int millisPerRoundMax = 10000;
 
     [SerializeField]
-    private Transform gameLevel;
+    private bool loadFigures;
 
     [SerializeField]
     private Graphics graphics;
@@ -43,15 +45,23 @@ public class GameController : MonoBehaviour
 
     private void Awake()
     {
-        if (!gameLevel || !input || !graphics)
+        if (!figure || !input || !graphics)
         {
             Debug.LogError("GameController: fields are not set");
             return;
         }
 
         player = new Player();
+        int roundsCount = 10;
 
-        game = new Game(player, CalculateRoundTimes(50), 1);
+        if (loadFigures)
+        {
+            figuresXml = new FiguresXml();
+            figuresXml.Load();
+            roundsCount = figuresXml.figureElements.Count;
+        }
+
+        game = new Game(player, CalculateRoundTimes(roundsCount), 1);
         game.RoundStarted += OnGameRoundStarted;
         game.RoundComplete += OnGameRoundComplete;
         game.GameStarted += OnGameStarted;
@@ -112,13 +122,16 @@ public class GameController : MonoBehaviour
 
     private void OnGameStarted(object sender, System.EventArgs e)
     {
-        LoadFigure();
+        currentFigureIdx = 0;
+        figure.Ready += OnFigureReady;
+        LoadNextFigure();
     }
 
     private void OnGameOver(object sender, GameOverEventArgs e)
     {
         Unsubscribe();
-        RemoveFigure();
+        figure.Unload();
+        figure.Ready -= OnFigureReady;
     }
 
     private void OnGameRoundStarted(object sender, RoundStartedEventArgs e)
@@ -133,7 +146,7 @@ public class GameController : MonoBehaviour
     private void OnGameRoundComplete(object sender, RoundCompleteEventArgs e)
     {
         Unsubscribe();
-        RemoveFigure();
+        figure.Unload();
         StartCoroutine(NextRound());
     }
 
@@ -153,26 +166,38 @@ public class GameController : MonoBehaviour
 
         if (game != null)
         {
-            LoadFigure();
+            LoadNextFigure();
         }
     }
 
-    private void LoadFigure()
+    private void LoadNextFigure()
     {
-        // TODO: Load new figure
-        figure.gameObject.SetActive(true);
-        figure.Init();
+        if (!loadFigures)
+        {
+            figure.Load(null);
+            return;
+        }
 
-        if (figure.Validate())
+        if (currentFigureIdx >= figuresXml.figureElements.Count)
+        {
+            Debug.LogWarning("No more figures available");
+            game.FinishGame();
+            return;
+        }
+        figure.Load(figuresXml.figureElements[currentFigureIdx]);
+        currentFigureIdx++;
+    }
+
+    private void OnFigureReady()
+    {
+        if (figure.IsValid)
         {
             figure.StartTry();
-            figure.Ready += game.StartNextRound;
+            game.StartNextRound();
         }
-    }
-
-    private void RemoveFigure()
-    {
-        // TODO: destroy GO
-        figure.gameObject.SetActive(false);
+        else
+        {
+            LoadNextFigure();
+        }
     }
 }

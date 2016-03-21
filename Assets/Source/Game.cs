@@ -81,7 +81,7 @@ class Game
 
         if (roundTimeLeft <= 0)
         {
-            OnTimeRunOut();
+            FinishGame();
             return;
         }
 
@@ -103,9 +103,9 @@ class Game
         TimeUpdated(this, args);
     }
 
-    private void OnTimeRunOut()
+    public void FinishGame()
     {
-        Debug.Log("Time has run out");
+        Debug.Log("Game over");
 
         if (currentRoundIndex > 0)
         {

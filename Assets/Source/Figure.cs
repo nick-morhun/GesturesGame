@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
+using System.Xml.Linq;
 
 public class Figure : MonoBehaviour
 {
@@ -26,12 +27,21 @@ public class Figure : MonoBehaviour
     private int minLineLength = 1;
 
     [SerializeField]
+    private Line linePrefab;
+
+    [SerializeField]
     private List<Line> figureLines;
 
+    private string path
+    {
+        get { return Application.persistentDataPath + "/figures.xml"; }
+    }
 
     public event UnityAction Ready = delegate { };
 
     public event UnityAction DrawSuccess = delegate { };
+
+    public bool IsValid { get; private set; }
 
     /// <summary>
     /// Call this before every try.
@@ -66,26 +76,80 @@ public class Figure : MonoBehaviour
         prevPointerPos = pointerPos;
     }
 
-    // Use this for initialization
-    public void Init()
+    public void Load(XElement figureElement)
     {
-        if (figureLines.Count < 3)
+        if (figureElement != null)
         {
-            Debug.LogError("At least 3 lines required");
+            int e = 0;
+
+            foreach (var lineElement in figureElement.Elements())
+            {
+                var line = Object.Instantiate(linePrefab);
+                line.transform.SetParent(transform);
+                line.name = "Line " + e++;
+                line.Load(lineElement);
+                figureLines.Add(line);
+            }
+        }
+
+        IsValid = Validate();
+
+        if (IsValid)
+        {
+            figureLines[0].Previous = figureLines[figureLines.Count - 1];
+
+            for (int i = 1; i < figureLines.Count; i++)
+            {
+                figureLines[i].Previous = figureLines[i - 1];
+            }
+
+            StartCoroutine(ComputeCornerThreshold());
+        }
+        else
+        {
+            Debug.LogError("Invalid figure");
+            Ready();
+        }
+    }
+
+    public void Save()
+    {
+        IsValid = Validate();
+
+        if (!IsValid)
+        {
+            Debug.LogError("Invalid figure");
             return;
         }
 
-        figureLines[0].Previous = figureLines[figureLines.Count - 1];
+        var figuresXML = new XDocument(new XElement("Figures"));
 
-        for (int i = 1; i < figureLines.Count; i++)
+        var figureElement = new XElement("Figure");
+
+        for (int i = 0; i < figureLines.Count; i++)
         {
-            figureLines[i].Previous = figureLines[i - 1];
+            figureElement.Add(figureLines[i].Save());
         }
 
-        StartCoroutine(ComputeCornerThreshold());
+        figuresXML.Root.Add(figureElement);
+        figuresXML.Save(path);
+        Debug.Log("Saved to " + path);
     }
 
-    public bool Validate()
+    public void Unload()
+    {
+        foreach (var line in figureLines)
+        {
+            if (line)
+            {
+                Object.Destroy(line);
+            }
+        }
+
+        IsValid = false;
+    }
+
+    private bool Validate()
     {
         if (figureLines.Count < 3)
         {
@@ -102,6 +166,15 @@ public class Figure : MonoBehaviour
         }
 
         return true;
+    }
+
+    // Use this for initialization
+    private void Start()
+    {
+        if (!linePrefab)
+        {
+            Debug.LogError("linePrefab was not set");
+        }
     }
 
     private IEnumerator ComputeCornerThreshold()
