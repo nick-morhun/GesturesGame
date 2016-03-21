@@ -43,6 +43,12 @@ public class GameController : MonoBehaviour
         input.Reset();
     }
 
+    public void SaveFigure()
+    {
+        figuresXml.figureElements.Add(figure.Save());
+        figuresXml.Save();
+    }
+
     private void Awake()
     {
         if (!figure || !input || !graphics)
@@ -54,10 +60,11 @@ public class GameController : MonoBehaviour
         player = new Player();
         int roundsCount = 10;
 
+        figuresXml = new FiguresXml();
+        figuresXml.Load();
+
         if (loadFigures)
         {
-            figuresXml = new FiguresXml();
-            figuresXml.Load();
             roundsCount = figuresXml.figureElements.Count;
         }
 
@@ -130,7 +137,12 @@ public class GameController : MonoBehaviour
     private void OnGameOver(object sender, GameOverEventArgs e)
     {
         Unsubscribe();
-        figure.Unload();
+
+        if (loadFigures)
+        {
+            figure.Unload();
+        }
+
         figure.Ready -= OnFigureReady;
     }
 
@@ -146,7 +158,12 @@ public class GameController : MonoBehaviour
     private void OnGameRoundComplete(object sender, RoundCompleteEventArgs e)
     {
         Unsubscribe();
-        figure.Unload();
+
+        if (loadFigures)
+        {
+            figure.Unload();
+        }
+
         StartCoroutine(NextRound());
     }
 

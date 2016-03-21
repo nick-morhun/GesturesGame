@@ -112,28 +112,23 @@ public class Figure : MonoBehaviour
         }
     }
 
-    public void Save()
+    public XElement Save()
     {
+        XElement figureElement = new XElement("Figure");
         IsValid = Validate();
 
         if (!IsValid)
         {
             Debug.LogError("Invalid figure");
-            return;
+            return null;
         }
-
-        var figuresXML = new XDocument(new XElement("Figures"));
-
-        var figureElement = new XElement("Figure");
 
         for (int i = 0; i < figureLines.Count; i++)
         {
             figureElement.Add(figureLines[i].Save());
         }
 
-        figuresXML.Root.Add(figureElement);
-        figuresXML.Save(path);
-        Debug.Log("Saved to " + path);
+        return figureElement;
     }
 
     public void Unload()
@@ -146,6 +141,7 @@ public class Figure : MonoBehaviour
             }
         }
 
+        figureLines.Clear();
         IsValid = false;
     }
 

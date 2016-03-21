@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FiguresXml
 {
-    public List<XElement> figureElements;
+    public List<XElement> figureElements = new List<XElement>();
 
     private string path
     {
