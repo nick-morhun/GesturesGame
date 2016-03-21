@@ -119,7 +119,7 @@ public class GameController : MonoBehaviour
             Debug.Log("Round #" + i + " lasts " + t + " sec");
         }
 
-        if (times[0] < millisPerRoundMin / millisPerRoundMin)
+        if (times[0] < millisPerRoundMin / 1000)
         {
             times[0] = 1;
         }
