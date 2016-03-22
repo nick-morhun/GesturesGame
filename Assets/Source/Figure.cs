@@ -42,11 +42,6 @@ public class Figure : MonoBehaviour
     [SerializeField]
     private List<Line> figureLines;
 
-    private string path
-    {
-        get { return Application.persistentDataPath + "/figures.xml"; }
-    }
-
     public event UnityAction Ready = delegate { };
 
     public event UnityAction DrawSuccess = delegate { };
