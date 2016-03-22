@@ -20,6 +20,8 @@ public class Line : MonoBehaviour
 
     public Line Previous = null;
 
+    public Line Next = null;
+
     public Vector3 StartPoint { get { return start.position; } }
 
     public Vector3 EndPoint { get { return end.position; } }

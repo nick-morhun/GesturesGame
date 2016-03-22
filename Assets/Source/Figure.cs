@@ -14,19 +14,9 @@ public class Figure : MonoBehaviour
 
     private float minVertexAngle = 45;
 
-    /// <summary>
-    /// Each line is the last line of candidate figure # i
-    /// </summary>
-    private List<Line> candidateLines;
+    private FigureMatcher forwardMatcher;
 
-    /// <summary>
-    /// Each number is the line count of candidate figure # i
-    /// </summary>
-    private List<int> candidatePathsLengths;
-
-    private List<int> replacedIndices;
-
-    private bool isFirstLineDrawn;
+    private FigureMatcher backwardMatcher;
 
     [SerializeField]
     [Range(1f, 100f)]
@@ -56,11 +46,9 @@ public class Figure : MonoBehaviour
     /// </summary>
     public void StartTry()
     {
-        candidateLines = new List<Line>(figureLines.Count);
-        candidatePathsLengths = new List<int>(figureLines.Count);
-
+        forwardMatcher.StartTry();
+        backwardMatcher.StartTry();
         currentLineAngle = InvalidAngle;
-        isFirstLineDrawn = false;
     }
 
     public void OnInputTouchStarted(Vector3 pointerPos)
@@ -106,10 +94,12 @@ public class Figure : MonoBehaviour
         if (IsValid)
         {
             figureLines[0].Previous = figureLines[figureLines.Count - 1];
+            figureLines[figureLines.Count - 1].Next = figureLines[0];
 
             for (int i = 1; i < figureLines.Count; i++)
             {
                 figureLines[i].Previous = figureLines[i - 1];
+                figureLines[i - 1].Next = figureLines[i];
             }
 
             StartCoroutine(ComputeCornerThreshold());
@@ -180,8 +170,6 @@ public class Figure : MonoBehaviour
         {
             Debug.LogError("linePrefab was not set");
         }
-
-        replacedIndices = new List<int>();
     }
 
     private IEnumerator ComputeCornerThreshold()
@@ -199,77 +187,28 @@ public class Figure : MonoBehaviour
 
         minVertexAngle = Mathf.Min(figureAngles) / (2f * sensitivity);
         Debug.Log("minVertexAngle = " + minVertexAngle);
+
+        forwardMatcher = new FigureMatcher(figureLines, minVertexAngle, false);
+        forwardMatcher.Match += () => DrawSuccess();
+        backwardMatcher = new FigureMatcher(figureLines, minVertexAngle, true);
+        backwardMatcher.Match += () => DrawSuccess();
         Ready();
     }
 
+    /// <summary>
+    /// Returns true and checks for matching figures if user made a corner.
+    /// </summary>
+    /// <param name="drawnAngle">Angle between line's direction and x axis, degrees (-180; 180).</param>
     private bool WasLine(float drawnAngle)
     {
-        bool wasLine = false;
-
         if (currentLineAngle != InvalidAngle && Mathf.Abs(currentLineAngle - drawnAngle) < minVertexAngle)
         {
             // No corner
             return false;
         }
 
-        replacedIndices.Clear();
-
-        for (int i = 0; i < figureLines.Count; i++)
-        {
-            Line line = figureLines[i];
-
-            if (line.Match(drawnAngle, minVertexAngle))
-            {
-                if (candidateLines.Count != 0)
-                {
-                    // Other paths were started
-
-                    int prevLineIdx = candidateLines.IndexOf(line.Previous);
-
-                    if (prevLineIdx != -1)
-                    {
-                        // Other lines were on this path / candidate figure
-
-                        candidateLines[prevLineIdx] = line;
-                        candidatePathsLengths[prevLineIdx]++;
-                        replacedIndices.Add(prevLineIdx);
-                        wasLine = true;
-                        continue;
-                    }
-                }
-
-                if (!isFirstLineDrawn)
-                {
-                    // Start a new path / candidate figure
-                    replacedIndices.Add(candidateLines.Count);
-                    candidateLines.Add(line);
-                    candidatePathsLengths.Add(1);
-                    wasLine = true;
-                }
-            }
-        }
-
-        // Clean up paths
-        int removed = 0;
-
-        for (int i = 0; i < candidateLines.Count; i++)
-        {
-            if (candidatePathsLengths[i] == figureLines.Count)
-            {
-                DrawSuccess();
-                break;
-            }
-
-            if (!replacedIndices.Contains(i + removed))
-            {
-                candidateLines.RemoveAt(i);
-                candidatePathsLengths.RemoveAt(i);
-                i--;
-                removed++;
-            }
-        }
-
-        isFirstLineDrawn = true;
-        return wasLine;
+        forwardMatcher.MatchLine(drawnAngle);
+        backwardMatcher.MatchLine(drawnAngle);
+        return true;
     }
 }
