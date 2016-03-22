@@ -14,9 +14,19 @@ public class Figure : MonoBehaviour
 
     private float minVertexAngle = 45;
 
-    private List<Line> uncheckedLines;
-
+    /// <summary>
+    /// Each line is the last line of candidate figure # i
+    /// </summary>
     private List<Line> candidateLines;
+
+    /// <summary>
+    /// Each number is the line count of candidate figure # i
+    /// </summary>
+    private List<int> candidatePathsLengths;
+
+    private List<int> replacedIndices;
+
+    private bool isFirstLineDrawn;
 
     [SerializeField]
     [Range(1f, 100f)]
@@ -41,6 +51,9 @@ public class Figure : MonoBehaviour
 
     public event UnityAction DrawSuccess = delegate { };
 
+    /// <summary>
+    /// Is loaded figure valid?
+    /// </summary>
     public bool IsValid { get; private set; }
 
     /// <summary>
@@ -49,9 +62,10 @@ public class Figure : MonoBehaviour
     public void StartTry()
     {
         candidateLines = new List<Line>(figureLines.Count);
-        uncheckedLines = new List<Line>(figureLines);
+        candidatePathsLengths = new List<int>(figureLines.Count);
 
         currentLineAngle = InvalidAngle;
+        isFirstLineDrawn = false;
     }
 
     public void OnInputTouchStarted(Vector3 pointerPos)
@@ -171,6 +185,8 @@ public class Figure : MonoBehaviour
         {
             Debug.LogError("linePrefab was not set");
         }
+
+        replacedIndices = new List<int>();
     }
 
     private IEnumerator ComputeCornerThreshold()
@@ -182,7 +198,7 @@ public class Figure : MonoBehaviour
         {
             float ang = Line.Angle(figureLines[i], figureLines[i].Previous);
             ang += 180;
-            figureAngles[i] = ang > 360 ? ang - 360 : ang;
+            figureAngles[i] = Mathf.Abs(ang >= 360 ? ang - 360 : ang);
             Debug.Log("figureAngles[" + i + "] = " + figureAngles[i]);
         }
 
@@ -197,68 +213,68 @@ public class Figure : MonoBehaviour
 
         if (currentLineAngle != InvalidAngle && Mathf.Abs(currentLineAngle - drawnAngle) < minVertexAngle)
         {
+            // No corner
             return false;
         }
 
-        var newLines = new List<Line>();
+        replacedIndices.Clear();
 
-        if (candidateLines.Count != 0)
+        for (int i = 0; i < figureLines.Count; i++)
         {
-            // Other lines were complete
-            foreach (var line in uncheckedLines)
-            {
-                if (line.Match(drawnAngle, minVertexAngle))
-                {
-                    int prevLineIdx = candidateLines.IndexOf(line.Previous);
-                    if (prevLineIdx != -1)
-                    {
-                        // Other lines were complete on this path
-                        candidateLines[prevLineIdx] = line;
-                    }
-                    else
-                    {
-                        //candidateLines.Add(line);
-                        newLines.Add(line);
-                    }
+            Line line = figureLines[i];
 
-                    wasLine = true;
-                }
-                else
-                {
-                    newLines.Add(line);
-                }
-            }
-
-            uncheckedLines = newLines;
-
-            if (uncheckedLines.Count == 0)
-            {
-                DrawSuccess();
-            }
-
-            return wasLine;
-        }
-
-        foreach (var line in uncheckedLines)
-        {
             if (line.Match(drawnAngle, minVertexAngle))
             {
-                candidateLines.Add(line);
-                wasLine = true;
-            }
-            else
-            {
-                newLines.Add(line);
+                if (candidateLines.Count != 0)
+                {
+                    // Other paths were started
+
+                    int prevLineIdx = candidateLines.IndexOf(line.Previous);
+
+                    if (prevLineIdx != -1)
+                    {
+                        // Other lines were on this path / candidate figure
+
+                        candidateLines[prevLineIdx] = line;
+                        candidatePathsLengths[prevLineIdx]++;
+                        replacedIndices.Add(prevLineIdx);
+                        wasLine = true;
+                        continue;
+                    }
+                }
+
+                if (!isFirstLineDrawn)
+                {
+                    // Start a new path / candidate figure
+                    replacedIndices.Add(candidateLines.Count);
+                    candidateLines.Add(line);
+                    candidatePathsLengths.Add(1);
+                    wasLine = true;
+                }
             }
         }
 
-        uncheckedLines = newLines;
+        // Clean up paths
+        int removed = 0;
 
-        if (uncheckedLines.Count == 0)
+        for (int i = 0; i < candidateLines.Count; i++)
         {
-            DrawSuccess();
+            if (candidatePathsLengths[i] == figureLines.Count)
+            {
+                DrawSuccess();
+                break;
+            }
+
+            if (!replacedIndices.Contains(i + removed))
+            {
+                candidateLines.RemoveAt(i);
+                candidatePathsLengths.RemoveAt(i);
+                i--;
+                removed++;
+            }
         }
 
+        isFirstLineDrawn = true;
         return wasLine;
     }
 }

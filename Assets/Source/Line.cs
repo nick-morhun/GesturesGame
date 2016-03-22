@@ -49,7 +49,14 @@ public class Line : MonoBehaviour
 
     public bool Match(float angle, float minMatchAngle)
     {
-        return Mathf.Abs(angle - this.angle) < minMatchAngle;
+        float diff = Mathf.Abs(angle - this.angle);
+
+        if (diff > 360 - minMatchAngle)
+        {
+            diff = 360 - diff;
+        }
+
+        return diff < minMatchAngle;
     }
 
     public static float Angle(Line l1, Line l2)
