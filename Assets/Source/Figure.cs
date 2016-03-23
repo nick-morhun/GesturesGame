@@ -8,6 +8,8 @@ public class Figure : MonoBehaviour
 {
     const float InvalidAngle = 1000;
 
+    const float MinCornerAngle = 3;  // For input
+
     private Vector3 prevPointerPos;
 
     private float currentLineAngle;
@@ -19,8 +21,8 @@ public class Figure : MonoBehaviour
     private FigureMatcher backwardMatcher;
 
     [SerializeField]
-    [Range(1f, 100f)]
-    private float sensitivity = 1;
+    [Range(2f, 60f)]
+    private float sensitivity = 2;   // Fraction of min. figure's corner at which a line drawn matches figure's edge. For 90 deg. corner and sensitivity 2 it's 45 deg.
 
     [SerializeField]
     [Range(.1f, 10f)]
@@ -28,7 +30,7 @@ public class Figure : MonoBehaviour
 
     [SerializeField]
     [Range(5f, 45f)]
-    private float minCornerAllowed = 5f;
+    private float minCornerAllowed = 5f;   // In a figure
 
     [SerializeField]
     private Line linePrefab;
@@ -218,7 +220,8 @@ public class Figure : MonoBehaviour
             Debug.Log("figureAngles[" + i + "] = " + figureAngles[i]);
         }
 
-        float threshold = Mathf.Min(figureAngles) / (2f * sensitivity);
+        float threshold = Mathf.Min(figureAngles) / sensitivity;
+        threshold = Mathf.Max(MinCornerAngle, threshold);
         Debug.Log("minVertexAngle = " + threshold);
         return threshold;
     }
