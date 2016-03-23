@@ -212,7 +212,7 @@ public class GameController : MonoBehaviour
             figure.StartTry();
             game.StartNextRound();
         }
-        else
+        else if (loadFigures)
         {
             LoadNextFigure();
         }
