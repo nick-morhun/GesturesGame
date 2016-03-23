@@ -112,7 +112,14 @@ public class Figure : MonoBehaviour
             }
 
             IsValid = ValidateCornerAngles();
-            StartCoroutine(ComputeCornerThresholdRoutine());
+
+            minVertexAngle = ComputeCornerThreshold();
+
+            forwardMatcher = new FigureMatcher(figureLines, minVertexAngle, false);
+            forwardMatcher.Match += () => DrawSuccess();
+            backwardMatcher = new FigureMatcher(figureLines, minVertexAngle, true);
+            backwardMatcher.Match += () => DrawSuccess();
+            Ready();
         }
         else
         {
@@ -199,19 +206,6 @@ public class Figure : MonoBehaviour
         {
             Debug.LogError("linePrefab was not set");
         }
-    }
-
-    private IEnumerator ComputeCornerThresholdRoutine()
-    {
-        yield return null; // Can be skipped when loading from XML
-
-        minVertexAngle = ComputeCornerThreshold();
-
-        forwardMatcher = new FigureMatcher(figureLines, minVertexAngle, false);
-        forwardMatcher.Match += () => DrawSuccess();
-        backwardMatcher = new FigureMatcher(figureLines, minVertexAngle, true);
-        backwardMatcher.Match += () => DrawSuccess();
-        Ready();
     }
 
     private float ComputeCornerThreshold()
