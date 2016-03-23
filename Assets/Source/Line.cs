@@ -4,9 +4,9 @@ using UnityEngine;
 public class Line : MonoBehaviour
 {
     /// <summary>
-    /// Available after Load()
+    /// Angle btween this line's forward vector and X axis. Available after Load()
     /// </summary>
-    float angle;
+    private float angle;
 
     [SerializeField]
     [Range(.05f, 1f)]
@@ -22,10 +22,6 @@ public class Line : MonoBehaviour
 
     public Line Next = null;
 
-    public Vector3 StartPoint { get { return start.position; } }
-
-    public Vector3 EndPoint { get { return end.position; } }
-
     public void Load(XElement lineElement)
     {
         float centerX = float.Parse(lineElement.Attribute("CenterX").Value);
@@ -37,6 +33,7 @@ public class Line : MonoBehaviour
         transform.position = new Vector3(centerX, centerY);
         transform.localScale = new Vector3(length, width, 1f);
         transform.localRotation = Quaternion.Euler(0, 0, angle);
+        Debug.Log("Line loaded: " + name);
     }
 
     public XElement Save()
@@ -61,16 +58,22 @@ public class Line : MonoBehaviour
         return diff < minMatchAngle;
     }
 
+    /// <summary>
+    /// Returns an angle between line vectors.
+    /// </summary>
+    /// <param name="l1">The line starting the angle.</param>
+    /// <param name="l2">The line finishing the angle.</param>
+    /// <returns>Angle in (0; 360) range.</returns>
     public static float Angle(Line l1, Line l2)
     {
-        // Debug.Log(l1.angle - l2.angle);
-        return l1.angle - l2.angle;
+        float angle = l1.angle - l2.angle; // (-360;360)
+        float angle2 = angle < 0 ? angle + 360 : angle;  // (0; 360)
+        return angle2;
     }
 
     public bool IsValid(float minLength)
     {
-        Debug.Log("Line length: " + (EndPoint - StartPoint).magnitude);
-        return (EndPoint - StartPoint).magnitude >= minLength;
+        return (end.position - start.position).magnitude >= minLength;
     }
 
     // Use this for initialization
@@ -78,6 +81,6 @@ public class Line : MonoBehaviour
     {
         angle = transform.localRotation.eulerAngles.z;
         angle = angle > 180 ? angle - 360 : angle;
-        Debug.Log("Line at angle " + angle);
+        //Debug.Log("Line at angle " + angle);
     }
 }

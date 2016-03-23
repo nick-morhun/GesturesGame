@@ -62,7 +62,7 @@ public class InputManager : MonoBehaviour
 #endif
             if (isPointerDown && (prevPointerScreenPos - Input.mousePosition).magnitude > EventSystem.current.pixelDragThreshold)
             {
-                Debug.Log("Touch at screen coordinates " + pointerWorldPosition);
+                //Debug.Log("Touch at screen coordinates " + pointerWorldPosition);
                 PointerMoved(pointerWorldPosition);
                 prevPointerScreenPos = Input.mousePosition;
             }

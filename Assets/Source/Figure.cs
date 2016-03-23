@@ -24,7 +24,11 @@ public class Figure : MonoBehaviour
 
     [SerializeField]
     [Range(.1f, 10f)]
-    private int minLineLength = 1;
+    private float minLineLength = 1;
+
+    [SerializeField]
+    [Range(5f, 45f)]
+    private float minCornerAllowed = 5f;
 
     [SerializeField]
     private Line linePrefab;
@@ -77,6 +81,7 @@ public class Figure : MonoBehaviour
     {
         if (figureElement != null)
         {
+            figureLines.Clear();
             int e = 0;
 
             foreach (var lineElement in figureElement.Elements())
@@ -88,8 +93,12 @@ public class Figure : MonoBehaviour
                 figureLines.Add(line);
             }
         }
+        else
+        {
+            Debug.LogWarning("Argument figureElement is null. Default figure can be used.");
+        }
 
-        IsValid = Validate();
+        IsValid = ValidateLines();
 
         if (IsValid)
         {
@@ -102,7 +111,8 @@ public class Figure : MonoBehaviour
                 figureLines[i - 1].Next = figureLines[i];
             }
 
-            StartCoroutine(ComputeCornerThreshold());
+            IsValid = ValidateCornerAngles();
+            StartCoroutine(ComputeCornerThresholdRoutine());
         }
         else
         {
@@ -114,7 +124,7 @@ public class Figure : MonoBehaviour
     public XElement Save()
     {
         XElement figureElement = new XElement("Figure");
-        IsValid = Validate();
+        IsValid = ValidateLines() && ValidateCornerAngles();
 
         if (!IsValid)
         {
@@ -136,7 +146,7 @@ public class Figure : MonoBehaviour
         {
             if (line)
             {
-                Object.Destroy(line);
+                Object.Destroy(line.gameObject);
             }
         }
 
@@ -144,7 +154,7 @@ public class Figure : MonoBehaviour
         IsValid = false;
     }
 
-    private bool Validate()
+    private bool ValidateLines()
     {
         if (figureLines.Count < 3)
         {
@@ -163,6 +173,25 @@ public class Figure : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Requires "Previous" fields of lines to be set.
+    /// </summary>
+    private bool ValidateCornerAngles()
+    {
+        for (int i = 0; i < figureLines.Count; i++)
+        {
+            float angle = Line.Angle(figureLines[i], figureLines[i].Previous);
+
+            if (angle < minCornerAllowed)
+            {
+                Debug.LogWarning("figureAngles[" + i + "] = " + angle + " is too small");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     // Use this for initialization
     private void Start()
     {
@@ -172,27 +201,32 @@ public class Figure : MonoBehaviour
         }
     }
 
-    private IEnumerator ComputeCornerThreshold()
+    private IEnumerator ComputeCornerThresholdRoutine()
     {
-        yield return null;
-        float[] figureAngles = new float[figureLines.Count];
+        yield return null; // Can be skipped when loading from XML
 
-        for (int i = 0; i < figureLines.Count; i++)
-        {
-            float ang = Line.Angle(figureLines[i], figureLines[i].Previous);
-            ang += 180;
-            figureAngles[i] = Mathf.Abs(ang >= 360 ? ang - 360 : ang);
-            Debug.Log("figureAngles[" + i + "] = " + figureAngles[i]);
-        }
-
-        minVertexAngle = Mathf.Min(figureAngles) / (2f * sensitivity);
-        Debug.Log("minVertexAngle = " + minVertexAngle);
+        minVertexAngle = ComputeCornerThreshold();
 
         forwardMatcher = new FigureMatcher(figureLines, minVertexAngle, false);
         forwardMatcher.Match += () => DrawSuccess();
         backwardMatcher = new FigureMatcher(figureLines, minVertexAngle, true);
         backwardMatcher.Match += () => DrawSuccess();
         Ready();
+    }
+
+    private float ComputeCornerThreshold()
+    {
+        float[] figureAngles = new float[figureLines.Count];
+
+        for (int i = 0; i < figureLines.Count; i++)
+        {
+            figureAngles[i] = Line.Angle(figureLines[i], figureLines[i].Previous);
+            Debug.Log("figureAngles[" + i + "] = " + figureAngles[i]);
+        }
+
+        float threshold = Mathf.Min(figureAngles) / (2f * sensitivity);
+        Debug.Log("minVertexAngle = " + threshold);
+        return threshold;
     }
 
     /// <summary>
