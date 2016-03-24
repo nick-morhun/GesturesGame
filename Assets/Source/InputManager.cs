@@ -1,4 +1,4 @@
-﻿#define DEBUG_CTRLS
+﻿//#define DEBUG_CTRLS
 
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,9 +7,9 @@ using UnityEngine.EventSystems;
 [DisallowMultipleComponent]
 public class InputManager : MonoBehaviour
 {
-    Vector3 prevPointerScreenPos;
+    Vector3 prevPointerScreenPos = -Vector3.one;
 
-    bool isPointerDown = false;
+    bool isPointerDown;
 
     public bool AcceptInput;
 
@@ -42,8 +42,9 @@ public class InputManager : MonoBehaviour
 
             isPointerDown = true;
 
-            Debug.Log("Touch started at screen coordinates " + pointerWorldPosition);
+            //Debug.Log("Touch started at world coordinates " + pointerWorldPosition);
             TouchStarted(pointerWorldPosition);
+            return;
         }
 
 #if DEBUG_CTRLS
@@ -53,18 +54,23 @@ public class InputManager : MonoBehaviour
 #endif
         {
             isPointerDown = false;
-            Debug.Log("Touch ended at screen coordinates " + pointerWorldPosition);
+            //Debug.Log("Touch ended at world coordinates " + pointerWorldPosition);
             TouchEnded();
+            return;
         }
 
 #if DEBUG_CTRLS
         if (Input.GetButtonDown("Submit"))
 #endif
-            if (isPointerDown && (prevPointerScreenPos - Input.mousePosition).magnitude > EventSystem.current.pixelDragThreshold)
+        if (isPointerDown && (prevPointerScreenPos - Input.mousePosition).magnitude > EventSystem.current.pixelDragThreshold)
+        {
+            if (prevPointerScreenPos != -Vector3.one)
             {
-                //Debug.Log("Touch at screen coordinates " + pointerWorldPosition);
                 PointerMoved(pointerWorldPosition);
-                prevPointerScreenPos = Input.mousePosition;
+                //Debug.Log("Touch at world coordinates " + pointerWorldPosition + " accept " + AcceptInput + " isPointerDown = " + isPointerDown);
             }
+
+            prevPointerScreenPos = Input.mousePosition;
+        }
     }
 }

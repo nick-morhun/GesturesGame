@@ -30,6 +30,9 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private Figure figure;
 
+    [SerializeField]
+    private CometPointer pointer;
+
     public void StartGame()
     {
         graphics.Initialize(game);
@@ -51,7 +54,7 @@ public class GameController : MonoBehaviour
 
     private void Awake()
     {
-        if (!figure || !input || !graphics)
+        if (!figure || !input || !graphics || !pointer)
         {
             Debug.LogError("GameController: fields are not set");
             return;
@@ -137,6 +140,7 @@ public class GameController : MonoBehaviour
     private void OnGameOver(object sender, GameOverEventArgs e)
     {
         Unsubscribe();
+        pointer.Hide();
 
         if (loadFigures)
         {
@@ -148,16 +152,18 @@ public class GameController : MonoBehaviour
 
     private void OnGameRoundStarted(object sender, RoundStartedEventArgs e)
     {
-        input.TouchStarted += figure.OnInputTouchStarted;
-        input.TouchEnded += figure.StartTry;
-        input.PointerMoved += figure.OnInputPointerMoved;
+        input.TouchStarted += OnInputTouchStarted;
+        input.TouchEnded += OnInputTouchEnded;
+        input.PointerMoved += OnInputPointerMoved;
         input.AcceptInput = true;
         figure.DrawSuccess += CompleteRound;
+        figure.LineAngleChanged += OnLineDetected;
     }
 
     private void OnGameRoundComplete(object sender, RoundCompleteEventArgs e)
     {
         Unsubscribe();
+        pointer.Hide();
 
         if (loadFigures)
         {
@@ -167,13 +173,35 @@ public class GameController : MonoBehaviour
         StartCoroutine(NextRound());
     }
 
+    private void OnInputTouchStarted(Vector3 pointerPos)
+    {
+        figure.OnInputTouchStarted(pointerPos);
+    }
+
+    private void OnInputTouchEnded()
+    {
+        pointer.Hide();
+    }
+
+    private void OnInputPointerMoved(Vector3 pointerPos)
+    {
+        pointer.OnInputPointerMoved(pointerPos);
+        figure.OnInputPointerMoved(pointerPos);
+    }
+
+    private void OnLineDetected(float angle)
+    {
+        pointer.SetAngle(angle);
+    }
+
     private void Unsubscribe()
     {
         input.AcceptInput = false;
-        input.TouchEnded -= figure.StartTry;
-        input.TouchStarted -= figure.OnInputTouchStarted;
-        input.PointerMoved -= figure.OnInputPointerMoved;
+        input.TouchStarted -= OnInputTouchStarted;
+        input.TouchEnded -= OnInputTouchEnded;
+        input.PointerMoved -= OnInputPointerMoved;
         figure.DrawSuccess -= CompleteRound;
+        figure.LineAngleChanged -= OnLineDetected;
         figure.Ready -= game.StartNextRound;
     }
 
@@ -209,7 +237,6 @@ public class GameController : MonoBehaviour
     {
         if (figure.IsValid)
         {
-            figure.StartTry();
             game.StartNextRound();
         }
         else if (loadFigures)

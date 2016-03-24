@@ -66,9 +66,7 @@ public class Line : MonoBehaviour
     /// <returns>Angle in (0; 180) range.</returns>
     public static float Angle(Line l1, Line l2)
     {
-        float angle = l1.angle - l2.angle; // (-360;360)
-        float angle2 = angle < -180 ? angle + 360 : (angle > 180 ? 360 - angle : angle);  // (-180; 180)
-        return Mathf.Abs(angle2);  // (0;180)
+        return Utils.Angle(l1.angle, l2.angle);
     }
 
     public bool IsValid(float minLength)

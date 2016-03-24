@@ -6,15 +6,9 @@ using System.Xml.Linq;
 
 public class Figure : MonoBehaviour
 {
-    const float InvalidAngle = 1000;
-
-    const float MinCornerAngle = 3;  // For input
-
-    private Vector3 prevPointerPos;
-
-    private float currentLineAngle;
-
     private float minVertexAngle = 45;
+
+    private CornerDetector detector;
 
     private FigureMatcher forwardMatcher;
 
@@ -40,6 +34,10 @@ public class Figure : MonoBehaviour
 
     public event UnityAction Ready = delegate { };
 
+    public event UnityAction<float> LineDetected = delegate { };
+
+    public event UnityAction<float> LineAngleChanged = delegate { };
+
     public event UnityAction DrawSuccess = delegate { };
 
     /// <summary>
@@ -54,29 +52,7 @@ public class Figure : MonoBehaviour
     {
         forwardMatcher.StartTry();
         backwardMatcher.StartTry();
-        currentLineAngle = InvalidAngle;
-    }
-
-    public void OnInputTouchStarted(Vector3 pointerPos)
-    {
-        prevPointerPos = pointerPos;
-    }
-
-    public void OnInputPointerMoved(Vector3 pointerPos)
-    {
-        Vector3 drawnline = pointerPos - prevPointerPos;
-        float angle = Mathf.Rad2Deg * Mathf.Atan2(drawnline.y, drawnline.x);
-
-        if (WasLine(angle) || currentLineAngle == InvalidAngle)
-        {
-            currentLineAngle = angle;     // Complete current line
-        }
-        else
-        {
-            currentLineAngle = (currentLineAngle + angle) / 2;  // Interpolate
-        }
-
-        prevPointerPos = pointerPos;
+        detector.StartTry();
     }
 
     public void Load(XElement figureElement)
@@ -121,6 +97,9 @@ public class Figure : MonoBehaviour
             forwardMatcher.Match += () => DrawSuccess();
             backwardMatcher = new FigureMatcher(figureLines, minVertexAngle, true);
             backwardMatcher.Match += () => DrawSuccess();
+            detector = new CornerDetector(minVertexAngle, 4);
+            detector.LineDetected += OnLineDetected;
+            detector.LineAngleChanged += OnLineAngleChanged;
             Ready();
         }
         else
@@ -160,7 +139,28 @@ public class Figure : MonoBehaviour
         }
 
         figureLines.Clear();
+        forwardMatcher.Match -= () => DrawSuccess();
+        backwardMatcher.Match -= () => DrawSuccess();
+        detector.LineDetected -= OnLineDetected;
+        detector.LineAngleChanged -= OnLineAngleChanged;
         IsValid = false;
+    }
+
+    internal void OnInputTouchStarted(Vector3 pos)
+    {
+        StartTry();
+        if (detector != null)
+        {
+            detector.OnInputTouchStarted(pos);
+        }
+    }
+
+    internal void OnInputPointerMoved(Vector3 pos)
+    {
+        if (detector != null)
+        {
+            detector.OnInputPointerMoved(pos);
+        }
     }
 
     private bool ValidateLines()
@@ -221,25 +221,22 @@ public class Figure : MonoBehaviour
         }
 
         float threshold = Mathf.Min(figureAngles) / sensitivity;
-        threshold = Mathf.Max(MinCornerAngle, threshold);
-        Debug.Log("minVertexAngle = " + threshold);
         return threshold;
     }
 
     /// <summary>
-    /// Returns true and checks for matching figures if user made a corner.
+    /// Returns true and checks for matching figures if user draws a line.
     /// </summary>
-    /// <param name="drawnAngle">Angle between line's direction and x axis, degrees (-180; 180).</param>
-    private bool WasLine(float drawnAngle)
+    /// <param name="angle">Angle between line's direction and x axis, degrees (-180; 180).</param>
+    private void OnLineDetected(float angle)
     {
-        if (currentLineAngle != InvalidAngle && Mathf.Abs(currentLineAngle - drawnAngle) < minVertexAngle)
-        {
-            // No corner
-            return false;
-        }
+        LineDetected(angle);
+        forwardMatcher.MatchLine(angle);
+        backwardMatcher.MatchLine(angle);
+    }
 
-        forwardMatcher.MatchLine(drawnAngle);
-        backwardMatcher.MatchLine(drawnAngle);
-        return true;
+    private void OnLineAngleChanged(float angle)
+    {
+        LineAngleChanged(angle);
     }
 }
