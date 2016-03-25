@@ -81,9 +81,7 @@ public class EditorFigure : Figure
         }
 
         currentLine.SetAngle(angle);
-
-        float length = currentLine.SetLength(currentLineVector.magnitude, minLineLength);
-
+        currentLine.SetLength(currentLineVector.magnitude, minLineLength);
         AdjustLastLine();
     }
 
@@ -127,17 +125,12 @@ public class EditorFigure : Figure
 
         if (lastLineVector.magnitude <= minLineLength)
         {
-            float newLength = minLineLength + .1f;
-            Debug.Log("AdjustLastLine: length = " + lastLineVector.magnitude + " angle = " + angle0);
-            Debug.LogWarning("lastLineVector is too short ");
-
-            Vector3 newLastLineStart = -lastLineVector.normalized * newLength;
-            lastLine.transform.position = currentLine.EndPoint;
+            Debug.LogError("AdjustLastLine: Safety failed. lastLineVector is too short ");
         }
 
         if (Utils.AnglesDiff(angle0, firstLine.AngleFromX) < minCornerAllowed)
         {
-            Debug.LogWarning("AdjustLastLine: angle failed = " + angle0);
+            Debug.LogError("AdjustLastLine: Safety failed. angle is too small: " + angle0);
         }
     }
 
