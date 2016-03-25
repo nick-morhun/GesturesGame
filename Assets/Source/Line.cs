@@ -13,6 +13,10 @@ public class Line : MonoBehaviour
     private float width;
 
     [SerializeField]
+    [Range(.01f, 1f)]
+    private float unitLengthScale;
+
+    [SerializeField]
     private Transform start;
 
     [SerializeField]
@@ -21,6 +25,12 @@ public class Line : MonoBehaviour
     public Line Previous = null;
 
     public Line Next = null;
+
+    public Vector3 StartPoint { get { return start.position; } }
+
+    public Vector3 EndPoint { get { return end.position; } }
+
+    public float AngleFromX { get { return angle; } }
 
     public void Load(XElement lineElement)
     {
@@ -66,12 +76,36 @@ public class Line : MonoBehaviour
     /// <returns>Angle in (0; 180) range.</returns>
     public static float Angle(Line l1, Line l2)
     {
-        return Utils.Angle(l1.angle, l2.angle);
+        return Utils.AnglesDiff(l1.angle, l2.angle);
     }
 
     public bool IsValid(float minLength)
     {
         return (end.position - start.position).magnitude >= minLength;
+    }
+
+    /// <summary>
+    /// Set line length.
+    /// </summary>
+    /// <param name="length">length in units</param>
+    /// <param name="minLength">Minimal allowed length in units</param>
+    /// <returns>Returns actual length set</returns>
+    public float SetLength(float length, float minLength)
+    {
+        if (length < minLength)
+        {
+            length = minLength + .1f;
+        }
+
+        transform.localScale = new Vector3(unitLengthScale * length, width, 1f);
+        return length;
+    }
+
+    public void SetAngle(float angle)
+    {
+        //Debug.Log("angle set to " + angle);
+        transform.localRotation = Quaternion.Euler(0, 0, angle);
+        this.angle = angle;
     }
 
     // Use this for initialization

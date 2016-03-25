@@ -56,6 +56,7 @@ public class GameFigure : Figure
             foreach (var lineElement in figureElement.Elements())
             {
                 var line = CreateLine(e);
+                figureLines.Add(line);
                 line.Load(lineElement);
                 e++;
             }
@@ -72,15 +73,6 @@ public class GameFigure : Figure
             Debug.LogError("Invalid figure");
             Loaded();
             return;
-        }
-
-        figureLines[0].Previous = figureLines[figureLines.Count - 1];
-        figureLines[figureLines.Count - 1].Next = figureLines[0];
-
-        for (int i = 1; i < figureLines.Count; i++)
-        {
-            figureLines[i].Previous = figureLines[i - 1];
-            figureLines[i - 1].Next = figureLines[i];
         }
 
         ValidateCornerAngles();

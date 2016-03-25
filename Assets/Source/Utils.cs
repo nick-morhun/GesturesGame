@@ -5,12 +5,21 @@ public static class Utils
 {
 
     /// <summary>
-    /// Returns an angle between line vectors.
+    /// Calculates an angle between 2 points on the same XY plane.
     /// </summary>
-    /// <param name="l1">The line starting the angle.</param>
-    /// <param name="l2">The line finishing the angle.</param>
+    /// <returns>Angle in degrees in (-180;180) range.</returns>
+    public static float Angle(Vector3 from, Vector3 to)
+    {
+        Vector3 drawnline = to - from;
+        float angle = Mathf.Rad2Deg * Mathf.Atan2(drawnline.y, drawnline.x);
+        return angle;
+    }
+
+    /// <summary>
+    /// Returns an angle magnitude between vector angles.
+    /// </summary>
     /// <returns>Angle in (0; 180) range.</returns>
-    public static float Angle(float angle1, float angle2)
+    public static float AnglesDiff(float angle1, float angle2)
     {
         float angle = angle1 - angle2; // (-360;360)
         float angle3 = angle < -180 ? angle + 360 : (angle > 180 ? 360 - angle : angle);  // (-180; 180)

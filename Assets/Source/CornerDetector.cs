@@ -57,8 +57,7 @@ public class CornerDetector
 
     public void OnInputPointerMoved(Vector3 pointerPos)
     {
-        Vector3 drawnline = pointerPos - prevPointerPos;
-        float angle = Mathf.Rad2Deg * Mathf.Atan2(drawnline.y, drawnline.x);
+        float angle = Utils.Angle(prevPointerPos, pointerPos);
 
         if (!WasCorner(currentLineAngle, angle) && CurrentLineAngle != InvalidAngle)
         {
@@ -99,7 +98,7 @@ public class CornerDetector
     /// <param name="drawnAngle">Angle between line's direction and x axis, degrees (-180; 180).</param>
     private bool WasCorner(float previousAngle, float drawnAngle)
     {
-        if (previousAngle == InvalidAngle || Utils.Angle(previousAngle, drawnAngle) < minVertexAngle)
+        if (previousAngle == InvalidAngle || Utils.AnglesDiff(previousAngle, drawnAngle) < minVertexAngle)
         {
             // No corner
             return false;

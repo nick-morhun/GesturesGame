@@ -599,7 +599,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minLineLength: 1
-  minCornerAllowed: 5
+  minCornerAllowed: 30
   linePrefab: {fileID: 11456028, guid: a81cd77ac43b556418962338b66187e6, type: 2}
   figureLines:
   - {fileID: 821254599}
@@ -3747,6 +3747,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 1794430099}
   - 222: {fileID: 1794430098}
+  - 225: {fileID: 1794430100}
   m_Layer: 5
   m_Name: GameGui
   m_TagString: Untagged
@@ -3780,6 +3781,17 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -0.000015258789}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
+--- !u!225 &1794430100
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1794430097}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1820794015
 GameObject:
   m_ObjectHideFlags: 0

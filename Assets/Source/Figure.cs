@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Events;
 using System.Xml.Linq;
 
 public class Figure : MonoBehaviour
@@ -9,11 +7,11 @@ public class Figure : MonoBehaviour
 
     [SerializeField]
     [Range(.1f, 10f)]
-    private float minLineLength = 1;
+    protected float minLineLength = 1;
 
     [SerializeField]
     [Range(5f, 45f)]
-    private float minCornerAllowed = 5f;   // In a figure
+    protected float minCornerAllowed = 5f;   // In a figure
 
     [SerializeField]
     private Line linePrefab;
@@ -49,7 +47,7 @@ public class Figure : MonoBehaviour
     {
         if (figureLines.Count < 3)
         {
-            Debug.LogError("At least 3 lines required");
+            Debug.LogWarning("At least 3 lines required");
             IsValid = false;
             return false;
         }
@@ -72,6 +70,15 @@ public class Figure : MonoBehaviour
     /// </summary>
     protected bool ValidateCornerAngles()
     {
+        figureLines[0].Previous = figureLines[figureLines.Count - 1];
+        figureLines[figureLines.Count - 1].Next = figureLines[0];
+
+        for (int i = 1; i < figureLines.Count; i++)
+        {
+            figureLines[i].Previous = figureLines[i - 1];
+            figureLines[i - 1].Next = figureLines[i];
+        }
+
         for (int i = 0; i < figureLines.Count; i++)
         {
             float angle = Line.Angle(figureLines[i], figureLines[i].Previous);
@@ -102,11 +109,10 @@ public class Figure : MonoBehaviour
         var line = Object.Instantiate(linePrefab);
         line.transform.SetParent(transform);
         line.name = "Line " + index;
-        figureLines.Add(line);
         return line;
     }
 
-    protected void CleanUp()
+    public void CleanUp()
     {
         foreach (var line in figureLines)
         {

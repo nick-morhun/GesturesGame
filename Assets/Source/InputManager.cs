@@ -26,7 +26,7 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
-        if (!AcceptInput)
+        if (!AcceptInput || EventSystem.current.IsPointerOverGameObject())
         {
             return;
         }
