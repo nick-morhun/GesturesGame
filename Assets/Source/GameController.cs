@@ -28,7 +28,7 @@ public class GameController : MonoBehaviour
     private InputManager input;
 
     [SerializeField]
-    private Figure figure;
+    private GameFigure figure;
 
     [SerializeField]
     private CometPointer pointer;
@@ -133,7 +133,7 @@ public class GameController : MonoBehaviour
     private void OnGameStarted(object sender, System.EventArgs e)
     {
         currentFigureIdx = 0;
-        figure.Ready += OnFigureReady;
+        figure.Loaded += OnFigureLoaded;
         LoadNextFigure();
     }
 
@@ -147,7 +147,7 @@ public class GameController : MonoBehaviour
             figure.Unload();
         }
 
-        figure.Ready -= OnFigureReady;
+        figure.Loaded -= OnFigureLoaded;
     }
 
     private void OnGameRoundStarted(object sender, RoundStartedEventArgs e)
@@ -202,7 +202,7 @@ public class GameController : MonoBehaviour
         input.PointerMoved -= OnInputPointerMoved;
         figure.DrawSuccess -= CompleteRound;
         figure.LineAngleChanged -= OnLineDetected;
-        figure.Ready -= game.StartNextRound;
+        figure.Loaded -= game.StartNextRound;
     }
 
     private IEnumerator NextRound()
@@ -233,7 +233,7 @@ public class GameController : MonoBehaviour
         currentFigureIdx++;
     }
 
-    private void OnFigureReady()
+    private void OnFigureLoaded()
     {
         if (figure.IsValid)
         {

@@ -595,10 +595,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 405360844}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a8ff4ba6caf392f469a3d5ca0a43b6e7, type: 3}
+  m_Script: {fileID: 11500000, guid: 18eff3a8ac30f414a806868687b0a1c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sensitivity: 3
   minLineLength: 1
   minCornerAllowed: 5
   linePrefab: {fileID: 11456028, guid: a81cd77ac43b556418962338b66187e6, type: 2}
@@ -607,6 +606,7 @@ MonoBehaviour:
   - {fileID: 401489136}
   - {fileID: 440698813}
   - {fileID: 381984466}
+  sensitivity: 3
 --- !u!114 &440698813 stripped
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 11456028, guid: a81cd77ac43b556418962338b66187e6,
