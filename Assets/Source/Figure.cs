@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using UnityEngine.Events;
 
 public class Figure : MonoBehaviour
 {
@@ -23,6 +24,8 @@ public class Figure : MonoBehaviour
     /// Is loaded figure valid?
     /// </summary>
     public bool IsValid { get; private set; }
+
+    public event UnityAction ValidationFailed = delegate { };
 
     public XElement Save()
     {
@@ -49,6 +52,7 @@ public class Figure : MonoBehaviour
         {
             Debug.LogWarning("At least 3 lines required");
             IsValid = false;
+            ValidationFailed();
             return false;
         }
 
@@ -57,6 +61,7 @@ public class Figure : MonoBehaviour
             if (!figureLines[i].IsValid(minLineLength))
             {
                 IsValid = false;
+                ValidationFailed();
                 return false;
             }
         }
@@ -87,6 +92,7 @@ public class Figure : MonoBehaviour
             {
                 Debug.LogWarning("figureAngles[" + i + "] = " + angle + " is too small");
                 IsValid = false;
+                ValidationFailed();
                 return false;
             }
         }

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 [DisallowMultipleComponent]
 public class EditorController : MonoBehaviour
@@ -28,6 +27,11 @@ public class EditorController : MonoBehaviour
         figuresXml.figureElements.Add(figure.Save());
         figuresXml.Save();
         NewFigure();
+    }
+
+    public void SwitchToGame()
+    {
+        SceneManager.LoadScene("main");
     }
 
     private void Awake()

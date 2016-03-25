@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 public class EditorFigure : Figure
 {
@@ -16,6 +17,8 @@ public class EditorFigure : Figure
 
     [SerializeField]
     private Transform debugObject;
+
+    public event UnityAction FigureStarted = delegate { };
 
     public void StartNewFigure()
     {
@@ -145,6 +148,11 @@ public class EditorFigure : Figure
         float angleWithPrevious = previousLine ? Line.Angle(currentLine, previousLine) : 1000;
         Debug.Log("Line complete. angle = " + currentLine.AngleFromX
             + " angleWithPrevious = " + angleWithPrevious);
+
+        if (figureLines.Count > 1)
+        {
+            FigureStarted();
+        }
     }
 
     public void CompleteFigure()
