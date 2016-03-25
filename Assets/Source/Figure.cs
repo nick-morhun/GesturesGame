@@ -14,6 +14,8 @@ public class Figure : MonoBehaviour
 
     private FigureMatcher backwardMatcher;
 
+    private bool isLoaded;
+
     [SerializeField]
     [Range(2f, 60f)]
     private float sensitivity = 2;   // Fraction of min. figure's corner at which a line drawn matches figure's edge. For 90 deg. corner and sensitivity 2 it's 45 deg.
@@ -59,7 +61,15 @@ public class Figure : MonoBehaviour
     {
         if (figureElement != null)
         {
-            figureLines.Clear();
+            if (isLoaded)
+            {
+                Unload();
+            }
+            else
+            {
+                CleanUp();
+            }
+
             int e = 0;
 
             foreach (var lineElement in figureElement.Elements())
@@ -100,6 +110,8 @@ public class Figure : MonoBehaviour
             detector = new CornerDetector(minVertexAngle, 4);
             detector.LineDetected += OnLineDetected;
             detector.LineAngleChanged += OnLineAngleChanged;
+
+            isLoaded = true;
             Ready();
         }
         else
@@ -130,20 +142,18 @@ public class Figure : MonoBehaviour
 
     public void Unload()
     {
-        foreach (var line in figureLines)
+        if (!isLoaded)
         {
-            if (line)
-            {
-                Object.Destroy(line.gameObject);
-            }
+            return;
         }
 
-        figureLines.Clear();
+        CleanUp();
         forwardMatcher.Match -= () => DrawSuccess();
         backwardMatcher.Match -= () => DrawSuccess();
         detector.LineDetected -= OnLineDetected;
         detector.LineAngleChanged -= OnLineAngleChanged;
         IsValid = false;
+        isLoaded = false;
     }
 
     internal void OnInputTouchStarted(Vector3 pos)
@@ -208,6 +218,19 @@ public class Figure : MonoBehaviour
         {
             Debug.LogError("linePrefab was not set");
         }
+    }
+
+    private void CleanUp()
+    {
+        foreach (var line in figureLines)
+        {
+            if (line)
+            {
+                Object.Destroy(line.gameObject);
+            }
+        }
+
+        figureLines.Clear();
     }
 
     private float ComputeCornerThreshold()
