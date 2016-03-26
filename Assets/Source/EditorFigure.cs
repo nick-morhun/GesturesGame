@@ -23,7 +23,12 @@ public class EditorFigure : Figure
     public void StartNewFigure()
     {
         base.CleanUp();
-        GameObject.Destroy(lastLine.gameObject);
+
+        if (lastLine)
+        {
+            GameObject.Destroy(lastLine.gameObject);
+        }
+
         currentLine = null;
         isLineComplete = false;
         lineIndex = 0;
