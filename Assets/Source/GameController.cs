@@ -13,7 +13,7 @@ public class GameController : MonoBehaviour
 
     private FiguresXml figuresXml;
 
-    private int currentFigureIdx = 0;
+    private int currentFigureIdx;
 
     [SerializeField]
     private int millisPerRoundMax = 10000;
@@ -132,7 +132,7 @@ public class GameController : MonoBehaviour
 
     private void OnGameStarted(object sender, System.EventArgs e)
     {
-        currentFigureIdx = 0;
+        currentFigureIdx = -1;
         figure.Loaded += OnFigureLoaded;
         LoadNextFigure();
     }
@@ -223,14 +223,16 @@ public class GameController : MonoBehaviour
             return;
         }
 
+        currentFigureIdx++;
+
         if (currentFigureIdx >= figuresXml.figureElements.Count)
         {
             Debug.LogWarning("No more figures available");
             game.FinishGame();
             return;
         }
+
         figure.Load(figuresXml.figureElements[currentFigureIdx]);
-        currentFigureIdx++;
     }
 
     private void OnFigureLoaded()
