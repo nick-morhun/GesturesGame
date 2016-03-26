@@ -2,6 +2,7 @@
 using System.IO;
 using System.Xml.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class FiguresXml
 {
@@ -16,6 +17,10 @@ public class FiguresXml
     {
         get { return Application.persistentDataPath + "/figures.xml"; }
     }
+
+    public event UnityAction SaveSuccessful = delegate { };
+
+    public event UnityAction SaveFailed = delegate { };
 
     public void Load()
     {
@@ -51,7 +56,16 @@ public class FiguresXml
             figuresXML.Root.Add(figureElement);
         }
 
-        figuresXML.Save(path);
-        Debug.Log("Saved to " + path);
+        try
+        {
+            figuresXML.Save(path);
+            Debug.Log("Saved to " + path);
+            SaveSuccessful();
+        }
+        catch (System.IO.IOException ex)
+        {
+            Debug.LogError(ex.Message);
+            SaveFailed();
+        }
     }
 }

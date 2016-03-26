@@ -6,8 +6,8 @@ public class EditorController : MonoBehaviour
 {
     private FiguresXml figuresXml;
 
-    //[SerializeField]
-    //private Graphics graphics;
+    [SerializeField]
+    private EditorGraphics graphics;
 
     [SerializeField]
     private InputManager input;
@@ -19,6 +19,7 @@ public class EditorController : MonoBehaviour
     {
         figure.StartNewFigure();
         input.Reset();
+        input.AcceptInput = true;
     }
 
     public void SaveFigure()
@@ -26,6 +27,14 @@ public class EditorController : MonoBehaviour
         figure.CompleteFigure();
         figuresXml.figureElements.Add(figure.Save());
         figuresXml.Save();
+        figure.StartNewFigure();
+    }
+
+    public void CleanAllFigures()
+    {
+        figuresXml.figureElements.Clear();
+        figuresXml.Save();
+        figuresXml.Load();
         NewFigure();
     }
 
@@ -36,7 +45,7 @@ public class EditorController : MonoBehaviour
 
     private void Awake()
     {
-        if (!figure || !input)
+        if (!figure || !input || !graphics)
         {
             Debug.LogError("EditorController: fields are not set");
             return;
@@ -49,6 +58,9 @@ public class EditorController : MonoBehaviour
         input.PointerMoved += OnInputPointerMoved;
         input.TouchEnded += OnInputTouchEnded;
         input.AcceptInput = true;
+        figure.ValidationFailed += OnValidationFailed;
+        figuresXml.SaveSuccessful += graphics.OnSaveSuccessful;
+        figuresXml.SaveFailed += graphics.OnSaveSaveFailed;
     }
 
     private void OnDestroy()
@@ -56,6 +68,9 @@ public class EditorController : MonoBehaviour
         input.TouchStarted -= OnInputTouchStarted;
         input.PointerMoved -= OnInputPointerMoved;
         input.TouchEnded -= OnInputTouchEnded;
+        figure.ValidationFailed -= OnValidationFailed;
+        figuresXml.SaveSuccessful -= graphics.OnSaveSuccessful;
+        figuresXml.SaveFailed -= graphics.OnSaveSaveFailed;
     }
 
     private void OnInputTouchStarted(Vector3 pointerPos)
@@ -71,5 +86,10 @@ public class EditorController : MonoBehaviour
     private void OnInputTouchEnded()
     {
         figure.CompleteLine();
+    }
+
+    private void OnValidationFailed()
+    {
+        input.AcceptInput = false;
     }
 }

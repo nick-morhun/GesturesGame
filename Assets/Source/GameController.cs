@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 [DisallowMultipleComponent]
 public class GameController : MonoBehaviour
@@ -46,10 +46,16 @@ public class GameController : MonoBehaviour
         input.Reset();
     }
 
+    // For debugging
     public void SaveFigure()
     {
         figuresXml.figureElements.Add(figure.Save());
         figuresXml.Save();
+    }
+
+    public void SwitchToEditor()
+    {
+        SceneManager.LoadScene("editor");
     }
 
     private void Awake()
@@ -69,6 +75,11 @@ public class GameController : MonoBehaviour
         if (loadFigures)
         {
             roundsCount = figuresXml.figureElements.Count;
+        }
+
+        if (roundsCount == 0)
+        {
+            graphics.DisableStart();
         }
 
         game = new Game(player, CalculateRoundTimes(roundsCount), 1);

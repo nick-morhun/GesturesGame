@@ -14,6 +14,9 @@ class EditorGraphics : MonoBehaviour
     private Button gameButton;
 
     [SerializeField]
+    private Text messageText;
+
+    [SerializeField]
     private EditorFigure figure;
 
     private void Start()
@@ -36,7 +39,20 @@ class EditorGraphics : MonoBehaviour
             saveButton.interactable = true;
             newButton.interactable = true;
         };
-        figure.ValidationFailed += () => { saveButton.interactable = false; };
+        figure.ValidationFailed += OnValidationFailed;
+    }
+
+    private void OnValidationFailed()
+    {
+        saveButton.interactable = false;
+        newButton.interactable = true;
+        ShowMessage("Ошибка: Фигура некорректна");
+    }
+
+    private void ShowMessage(string message)
+    {
+        messageText.gameObject.SetActive(true);
+        messageText.text = message;
     }
 
     private void OnGameClick()
@@ -48,6 +64,7 @@ class EditorGraphics : MonoBehaviour
 
     private void OnNewClick()
     {
+        messageText.gameObject.SetActive(false);
         saveButton.interactable = false;
         newButton.interactable = false;
     }
@@ -55,7 +72,18 @@ class EditorGraphics : MonoBehaviour
     private void OnSaveClick()
     {
         saveButton.interactable = false;
-        newButton.interactable = false;
+    }
+
+    internal void OnSaveSuccessful()
+    {
+        ShowMessage("Фигуры сохранены");
+        newButton.interactable = true;
+    }
+
+    internal void OnSaveSaveFailed()
+    {
+        ShowMessage("Ошибка: Сохранение не удалось");
+        newButton.interactable = true;
     }
 }
 

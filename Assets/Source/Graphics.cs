@@ -40,7 +40,6 @@ class Graphics : MonoBehaviour
             return;
         }
 
-        startButton.interactable = false;
         cheatButton.onClick.AddListener(() => cheatButton.gameObject.SetActive(false));
         ShowMenu();
     }
@@ -48,7 +47,6 @@ class Graphics : MonoBehaviour
     public void ShowMenu()
     {
         menuScreen.gameObject.SetActive(true);
-        startButton.interactable = true;
         resultsGui.gameObject.SetActive(false);
         gameGui.gameObject.SetActive(false);
     }
@@ -66,6 +64,11 @@ class Graphics : MonoBehaviour
         game.RoundStarted += OnRoundStarted;
         game.RoundComplete += OnRoundComplete;
         game.TimeUpdated += OnTimeUpdated;
+    }
+
+    public void DisableStart()
+    {
+        startButton.interactable = false;
     }
 
     private void OnGameStarted(object sender, System.EventArgs e)
@@ -86,12 +89,12 @@ class Graphics : MonoBehaviour
 
     private void OnTimeUpdated(object sender, TimeUpdatedEventArgs e)
     {
-        timer.text = string.Format("{0:D2},{1:D3} c", e.Time.Seconds, e.Time.Milliseconds);
+        timer.text = string.Format("{0},{1:D3} c", e.Time.Seconds, e.Time.Milliseconds);
     }
 
     private void OnRoundStarted(object sender, RoundStartedEventArgs e)
     {
-        cheatButton.gameObject.SetActive(true);
+        //cheatButton.gameObject.SetActive(true);
     }
 
     private void OnRoundComplete(object sender, RoundCompleteEventArgs e)
