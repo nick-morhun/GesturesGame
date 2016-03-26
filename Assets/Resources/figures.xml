@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Figures>
+  <Figure>
+    <Line CenterX="1.35" CenterY="-1.59" Length="0.15" Angle="90.3383942" />
+    <Line CenterX="1.18" CenterY="3.8" Length="0.15" Angle="-179.549042" />
+    <Line CenterX="-4.28" CenterY="3.62" Length="0.15" Angle="-90.2414246" />
+    <Line CenterX="-4.28" CenterY="-1.71" Length="0.05" Angle="-0.267059326" />
+    <Line CenterX="-2.51" CenterY="-1.72" Length="0.1" Angle="89.33559" />
+    <Line CenterX="-2.38" CenterY="1.83" Length="0.05" Angle="0" />
+    <Line CenterX="-0.66" CenterY="1.76" Length="0.1" Angle="-90.54996" />
+    <Line CenterX="-0.66" CenterY="-1.77" Length="0.06" Angle="0" />
+  </Figure>
+  <Figure>
+    <Line CenterX="3.59" CenterY="-0.28" Length="0.05" Angle="90.3383942" />
+    <Line CenterX="3.57" CenterY="1.48" Length="0.05" Angle="124.860016" />
+    <Line CenterX="2.54" CenterY="2.89" Length="0.05" Angle="150.000015" />
+    <Line CenterX="1.06" CenterY="3.74" Length="0.05" Angle="-179.999969" />
+    <Line CenterX="-0.63" CenterY="3.7" Length="0.1" Angle="-90" />
+    <Line CenterX="-0.67" CenterY="0.04" Length="0.05" Angle="0" />
+    <Line CenterX="1.17" CenterY="0.03" Length="0.05" Angle="-40.7999573" />
+    <Line CenterX="2.55" CenterY="-1.17" Length="0.04" Angle="36.20001" />
+  </Figure>
+  <Figure>
+    <Line CenterX="-2.41" CenterY="2.44" Length="0.13" Angle="0" />
+    <Line CenterX="2.31" CenterY="2.43" Length="0.1" Angle="-129.999985" />
+    <Line CenterX="-0.08" CenterY="-0.27" Length="0.1" Angle="131.700012" />
+  </Figure>
+  <Figure>
+    <Line CenterX="-2.41" CenterY="2.44" Length="0.13" Angle="0" />
+    <Line CenterX="2.3" CenterY="2.33" Length="0.1" Angle="-90" />
+    <Line CenterX="2.34" CenterY="-1.12" Length="0.13" Angle="-179.999969" />
+    <Line CenterX="-2.36" CenterY="-1.14" Length="0.1" Angle="90.00001" />
+  </Figure>
+  <Figure>
+    <Line CenterX="-4.09" CenterY="0.56" Length="0.13" Angle="30.7000027" />
+    <Line CenterX="0.12" CenterY="2.98" Length="0.13" Angle="-32.8499756" />
+    <Line CenterX="3.99" CenterY="0.43" Length="0.13" Angle="-148.999969" />
+    <Line CenterX="-0.16" CenterY="-1.99" Length="0.13" Angle="149.500015" />
+  </Figure>
+  <Figure>
+    <Line CenterX="3.32957745" CenterY="1.005634" Length="0.129064411" Angle="177.170212" />
+    <Line CenterX="-1.23373222" CenterY="1.23119485" Length="0.255445629" Angle="-10.7651482" />
+    <Line CenterX="7.64990044" CenterY="-0.457849145" Length="0.265010566" Angle="-150.723083" />
+    <Line CenterX="-0.5331564" CenterY="-5.045633" Length="0.208192" Angle="57.4484978" />
+  </Figure>
+  <Figure>
+    <Line CenterX="3.60000014" CenterY="1.6647886" Length="0.0712797046" Angle="-144.233322" />
+    <Line CenterX="1.55258322" CenterY="0.1899544" Length="0.2754901" Angle="-176.252213" />
+    <Line CenterX="-8.178911" CenterY="-0.4475041" Length="0.3470375" Angle="10.1666937" />
+  </Figure>
+  <Figure>
+    <Line CenterX="-0.338028163" CenterY="-0.278873235" Length="0.127813086" Angle="32.4711952" />
+    <Line CenterX="3.47918844" CenterY="2.15026474" Length="0.128362179" Angle="174.90097" />
+    <Line CenterX="-1.04685068" CenterY="2.55412579" Length="0.059824653" Angle="-29.7785912" />
+    <Line CenterX="0.7912899" CenterY="1.5023247" Length="0.06116199" Angle="-122.375587" />
+  </Figure>
+  <Figure>
+    <Line CenterX="-1.64910173" CenterY="-1.4766469" Length="0.114417769" Angle="90.93919" />
+    <Line CenterX="-1.71549273" CenterY="2.57319784" Length="0.193994954" Angle="-41.31417" />
+    <Line CenterX="3.44263363" CenterY="-1.960588" Length="0.148325771" Angle="174.570663" />
+  </Figure>
+  <Figure>
+    <Line CenterX="0.8730542" CenterY="2.72694588" Length="0.09077593" Angle="-53.6825333" />
+    <Line CenterX="2.776259" CenterY="0.137701273" Length="0.121484995" Angle="-149.411621" />
+    <Line CenterX="-0.9258654" CenterY="-2.050716" Length="0.139387473" Angle="119.7235" />
+    <Line CenterX="-3.372373" CenterY="2.234384" Length="0.123943247" Angle="6.61796665" />
+  </Figure>
+</Figures>

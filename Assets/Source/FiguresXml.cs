@@ -1,10 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Xml.Linq;
 using UnityEngine;
 
 public class FiguresXml
 {
     public List<XElement> figureElements = new List<XElement>();
+
+    private string defaultXmlResourcePath
+    {
+        get { return "figures"; }
+    }
 
     private string path
     {
@@ -17,7 +23,15 @@ public class FiguresXml
 
         try
         {
-            figuresXML = XDocument.Load(path);
+            if (File.Exists(path))
+            {
+                figuresXML = XDocument.Load(path);
+            }
+            else
+            {
+                TextAsset xml = Resources.Load<TextAsset>(defaultXmlResourcePath);
+                figuresXML = XDocument.Load(new StringReader(xml.text));
+            }
         }
         catch (System.IO.IOException ex)
         {
@@ -36,7 +50,7 @@ public class FiguresXml
         {
             figuresXML.Root.Add(figureElement);
         }
-        
+
         figuresXML.Save(path);
         Debug.Log("Saved to " + path);
     }
