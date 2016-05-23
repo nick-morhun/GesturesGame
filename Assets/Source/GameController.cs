@@ -152,6 +152,7 @@ public class GameController : MonoBehaviour
     {
         Unsubscribe();
         pointer.Hide();
+        input.Reset();
 
         if (loadFigures)
         {
