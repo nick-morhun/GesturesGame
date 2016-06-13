@@ -13,7 +13,11 @@ public class EditorFigure : Figure
 
     private Line firstLine;
 
-    private bool isLineComplete = false;
+    private bool isCurrentLineStarted = false;
+
+    private bool isCurrentLineComplete = false;
+
+    private bool isAnyLineComplete = false;
 
     [SerializeField]
     private Transform debugObject;
@@ -30,7 +34,7 @@ public class EditorFigure : Figure
         }
 
         currentLine = null;
-        isLineComplete = false;
+        isAnyLineComplete = false;
         lineIndex = 0;
     }
 
@@ -47,13 +51,15 @@ public class EditorFigure : Figure
         }
         else
         {
-            if (isLineComplete)
+            if (isCurrentLineComplete)
             {
                 NewLine(currentLine.EndPoint);  // The second etc. lines
             }
 
             DragLineEnd(start);
         }
+
+        isCurrentLineComplete = false;
     }
 
     public void DragLineEnd(Vector3 end)
@@ -91,6 +97,11 @@ public class EditorFigure : Figure
         currentLine.SetAngle(angle);
         currentLine.SetLength(currentLineVector.magnitude, minLineLength);
         AdjustLastLine();
+
+        if (!isCurrentLineStarted)
+        {
+            isCurrentLineStarted = true;
+        }
     }
 
     private bool CheckLastLine(Vector3 currentLineVector, float angle)
@@ -144,12 +155,15 @@ public class EditorFigure : Figure
 
     public void CompleteLine()
     {
-        if (!currentLine)
+        if (!currentLine || !isCurrentLineStarted)
         {
+            Debug.LogWarning("Line was not complete");
             return;
         }
 
-        isLineComplete = true;
+        isAnyLineComplete = true;
+        isCurrentLineComplete = true;
+        isCurrentLineStarted = false;
         float angleWithPrevious = previousLine ? Line.Angle(currentLine, previousLine) : 1000;
         Debug.Log("Line complete. angle = " + currentLine.AngleFromX
             + " angleWithPrevious = " + angleWithPrevious);
