@@ -4,6 +4,9 @@ using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// Loads and saves <see cref="FiguresXml.figureElements"/> to a file.
+/// </summary>
 public class FiguresXml
 {
     public List<XElement> figureElements = new List<XElement>();

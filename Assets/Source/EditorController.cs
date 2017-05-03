@@ -25,7 +25,9 @@ public class EditorController : MonoBehaviour
     public void SaveFigure()
     {
         figure.CompleteFigure();
-        figuresXml.figureElements.Add(figure.Save());
+
+        var figureXml = new FigureXml();
+        figuresXml.figureElements.Add(figureXml.GetXml(figure));
         figuresXml.Save();
         figure.StartNewFigure();
     }

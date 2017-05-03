@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System;
+using System.Xml.Linq;
 using UnityEngine;
 
 public class Line : MonoBehaviour
@@ -32,12 +33,17 @@ public class Line : MonoBehaviour
 
     public float AngleFromX { get { return angle; } }
 
-    public void Load(XElement lineElement)
+    public void Load(ILineReader lineReader)
     {
-        float centerX = float.Parse(lineElement.Attribute("CenterX").Value);
-        float centerY = float.Parse(lineElement.Attribute("CenterY").Value);
-        float length = float.Parse(lineElement.Attribute("Length").Value);
-        float angle = float.Parse(lineElement.Attribute("Angle").Value);
+        if (lineReader == null)
+        {
+            throw new ArgumentNullException("lineReader");
+        }
+
+        float centerX = float.Parse(lineReader.GetValue("CenterX"));
+        float centerY = float.Parse(lineReader.GetValue("CenterY"));
+        float length = float.Parse(lineReader.GetValue("Length"));
+        float angle = float.Parse(lineReader.GetValue("Angle"));
 
         this.angle = angle;
         transform.position = new Vector3(centerX, centerY);
@@ -46,14 +52,18 @@ public class Line : MonoBehaviour
         Debug.Log("Line loaded: " + name);
     }
 
-    public XElement Save()
+    public void Save(ILineWriter lineWriter)
     {
-        XElement lineElement = new XElement("Line",
-            new XAttribute("CenterX", transform.position.x),
-            new XAttribute("CenterY", transform.position.y),
-            new XAttribute("Length", transform.localScale.x),
-            new XAttribute("Angle", angle));
-        return lineElement;
+        if (lineWriter == null)
+        {
+            throw new ArgumentNullException("lineWriter");
+        }
+
+        lineWriter.NewLine();
+        lineWriter.SetValue("CenterX", transform.position.x);
+        lineWriter.SetValue("CenterY", transform.position.y);
+        lineWriter.SetValue("Length", transform.localScale.x);
+        lineWriter.SetValue("Angle", angle);
     }
 
     public bool Match(float angle, float minMatchAngle)

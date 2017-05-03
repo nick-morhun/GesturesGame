@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 using UnityEngine.Events;
+using System;
+using Object = UnityEngine.Object;
 
 public class Figure : MonoBehaviour
 {
@@ -27,23 +29,14 @@ public class Figure : MonoBehaviour
 
     public event UnityAction ValidationFailed = delegate { };
 
-    public XElement Save()
+    public void Save(IFigureWriter figureWriter)
     {
-        XElement figureElement = new XElement("Figure");
-        IsValid = ValidateLines() && ValidateCornerAngles();
-
-        if (!IsValid)
+        if (figureWriter == null)
         {
-            Debug.LogError("Invalid figure");
-            return null;
+            throw new ArgumentNullException("figureWriter");
         }
 
-        for (int i = 0; i < figureLines.Count; i++)
-        {
-            figureElement.Add(figureLines[i].Save());
-        }
-
-        return figureElement;
+        figureWriter.Save(figureLines);
     }
 
     protected bool ValidateLines()

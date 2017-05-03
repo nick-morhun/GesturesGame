@@ -49,7 +49,8 @@ public class GameController : MonoBehaviour
     // For debugging
     public void SaveFigure()
     {
-        figuresXml.figureElements.Add(figure.Save());
+        var figureXml = new FigureXml();
+        figuresXml.figureElements.Add(figureXml.GetXml(figure));
         figuresXml.Save();
     }
 
@@ -244,7 +245,8 @@ public class GameController : MonoBehaviour
             return;
         }
 
-        figure.Load(figuresXml.figureElements[currentFigureIdx]);
+        var figureXml = new FigureXml();
+        figureXml.Load(figuresXml.figureElements[currentFigureIdx], figure);
     }
 
     private void OnFigureLoaded()

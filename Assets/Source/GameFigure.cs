@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using System.Xml.Linq;
+using System;
 
 public class GameFigure : Figure
 {
@@ -38,9 +39,9 @@ public class GameFigure : Figure
         detector.StartTry();
     }
 
-    public void Load(XElement figureElement)
+    public void Load(IFigureReader figureReader)
     {
-        if (figureElement != null)
+        if (figureReader != null)
         {
             if (isLoaded)
             {
@@ -53,11 +54,11 @@ public class GameFigure : Figure
 
             int e = 0;
 
-            foreach (var lineElement in figureElement.Elements())
+            foreach (var lineReader in figureReader.LineReaders)
             {
                 var line = CreateLine(e);
                 figureLines.Add(line);
-                line.Load(lineElement);
+                line.Load(lineReader);
                 e++;
             }
         }
