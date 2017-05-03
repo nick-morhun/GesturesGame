@@ -27,6 +27,7 @@ public class FiguresXml
 
     public void Load()
     {
+        Debug.LogFormat("Figures file path: {0}", path);
         XDocument figuresXML = null;
 
         try
