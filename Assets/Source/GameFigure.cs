@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
-using System.Xml.Linq;
 using System;
 
 public class GameFigure : Figure
