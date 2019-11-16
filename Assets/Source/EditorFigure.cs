@@ -17,8 +17,6 @@ public class EditorFigure : Figure
 
     private bool isCurrentLineComplete = false;
 
-    private bool isAnyLineComplete = false;
-
     [SerializeField]
     private Transform debugObject;
 
@@ -26,15 +24,14 @@ public class EditorFigure : Figure
 
     public void StartNewFigure()
     {
-        base.CleanUp();
+        CleanUp();
 
         if (lastLine)
         {
-            GameObject.Destroy(lastLine.gameObject);
+            Destroy(lastLine.gameObject);
         }
 
         currentLine = null;
-        isAnyLineComplete = false;
         lineIndex = 0;
     }
 
@@ -161,7 +158,6 @@ public class EditorFigure : Figure
             return;
         }
 
-        isAnyLineComplete = true;
         isCurrentLineComplete = true;
         isCurrentLineStarted = false;
         float angleWithPrevious = previousLine ? Line.Angle(currentLine, previousLine) : 1000;
@@ -178,12 +174,6 @@ public class EditorFigure : Figure
     {
         figureLines.Add(lastLine);
         Debug.Log("Figure complete");
-    }
-
-    // Use this for initialization
-    protected override void Start()
-    {
-        base.Start();
     }
 
     private void NewLine(Vector3 pos)

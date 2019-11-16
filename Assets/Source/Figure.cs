@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine.Events;
 using System;
-using Object = UnityEngine.Object;
 
 public class Figure : MonoBehaviour
 {
@@ -93,7 +92,6 @@ public class Figure : MonoBehaviour
         return true;
     }
 
-    // Use this for initialization
     protected virtual void Start()
     {
         if (!linePrefab)
@@ -104,7 +102,7 @@ public class Figure : MonoBehaviour
 
     protected Line CreateLine(int index)
     {
-        var line = Object.Instantiate(linePrefab);
+        var line = Instantiate(linePrefab);
         line.transform.SetParent(transform);
         line.name = "Line " + index;
         return line;
@@ -116,7 +114,7 @@ public class Figure : MonoBehaviour
         {
             if (line)
             {
-                Object.Destroy(line.gameObject);
+                Destroy(line.gameObject);
             }
         }
 
